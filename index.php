@@ -8,10 +8,15 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 $method = $_SERVER['REQUEST_METHOD'];
 $formData = getFormData($method);
+
 $url = (isset($_GET['q'])) ? $_GET['q'] : '';
 $url = rtrim($url, '/');
 $urls = explode('/', $url);
-print_r($formData);
+
+$router = $urls[0];
+$urlData = array_slice($urls, 1);
+include_once 'Controllers/' . $router . '.php';
+route($method, $urlData, $formData);
 ?>
 
 <?php
