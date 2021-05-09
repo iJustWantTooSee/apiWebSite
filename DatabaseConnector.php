@@ -2,14 +2,21 @@
 namespace DataBase;
 use mysqli;
 require_once 'C:\viktor\key\connection.php';
+
 class DatabaseConnector
 {
-    function GetResultsQueries($request, $amountRows=1) : array
-    {
-        global $host, $user, $password, $database;
-        $link = mysqli_connect($host, $user, $password, $database) 
+    function GetMySqlLink() : mysqli
+    { 
+       global  $host, $user, $password, $database; 
+       $link = mysqli_connect($host, $user, $password, $database) 
             or die("Ошибка " . mysqli_error($link)); 
 
+       return $link; 
+    }
+
+    function GetResultsQueries($request, $amountRows=1) : array
+    {
+        $link = $this->GetMySqlLink();
         $request=htmlentities(mysqli_real_escape_string($link,$request));
         $res = mysqli_query($link, $request) or die("Ошибка " . mysqli_error($link));
         if (!$res) //SQL
@@ -31,6 +38,18 @@ class DatabaseConnector
             return $data;
         }
         $link->close();
+    }
+
+    function Insert($request) : bool{
+        $link = $this->GetMySqlLink();
+        $result = mysqli_query($link, $request) or die("Ошибка " . mysqli_error($link)); 
+        if(!$result)
+        {
+            echo "Произошла ошибка парсинга";
+            return false;
+        }
+        $link->close();
+        return true;
     }
 }
 ?>
