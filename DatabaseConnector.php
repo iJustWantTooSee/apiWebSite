@@ -17,7 +17,6 @@ class DatabaseConnector
     function GetResultsQueries($request, $amountRows=1) : array
     {
         $link = $this->GetMySqlLink();
-        $request=htmlentities(mysqli_real_escape_string($link,$request));
         $res = mysqli_query($link, $request) or die("Ошибка " . mysqli_error($link));
         if (!$res) //SQL
         {

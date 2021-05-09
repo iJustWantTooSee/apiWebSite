@@ -15,7 +15,9 @@
             if(!isset($Birthday)){
                 $Birthday = null;
             }
-            
+            if($this->IsExistenceUser($Username)){
+                exit("Данный юзер уже существует");
+            }
             $query = "INSERT INTO `users`
             (`Id`, `Name`, `Surname`, `UserName`, `Birthday`, `Avatar`, `Status`, `CityId`, `RoleId`, `Password`)
              VALUES (null,'$Name','$Surname','$Username','$Birthday',null,null,null,null,'$Password')";
@@ -23,6 +25,15 @@
                 echo 'Произошла ошибка';
             
 
+        }
+
+        function IsExistenceUser($Username) : bool{
+            global $db;
+            $amountUser = $db->GetResultsQueries("SELECT Username FROM users WHERE Username = " . '"' . $Username .'"');
+            if (sizeof($amountUser)>0){
+                return true;
+            }
+            return false;
         }
     }
 
