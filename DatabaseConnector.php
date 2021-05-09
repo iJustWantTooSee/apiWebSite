@@ -4,7 +4,7 @@ use mysqli;
 require_once 'C:\viktor\key\connection.php';
 class DatabaseConnector
 {
-    function GetResultsQueries($request)
+    function GetResultsQueries($request, $amountRows=1) : array
     {
         global $host, $user, $password, $database;
         $link = mysqli_connect($host, $user, $password, $database) 
@@ -17,12 +17,18 @@ class DatabaseConnector
             echo "Не удалось выполнить запрос: (" . $link->errno . ") " . $link->error;
         } else {
             $amount_rows = mysqli_num_rows($res);
-            $cities = array();
+            $data = array();
+            $dataFromRow = array();
             for($i = 0; $i< $amount_rows; $i++){
-                $cities[] = mysqli_fetch_row($res)[0];
+                $temp_data = mysqli_fetch_row($res);
+                for ($j=0; $j < sizeof($temp_data); $j++) { 
+                    $dataFromRow[]=$temp_data[$j];
+                }
+                $data[]=$dataFromRow;
+                $dataFromRow = array();
             }
             $link->close();
-            return $cities;
+            return $data;
         }
         $link->close();
     }
