@@ -48,7 +48,7 @@ function Delete($method, $urlData, $formData){
 
 function OutputCities(){
     global $db;
-    $cities=$db->GetResultsQueries("SELECT * FROM city");
+    $cities=$db->GetResultsQueries("SELECT Name FROM cities");
     print_r($cities);
 }
 
