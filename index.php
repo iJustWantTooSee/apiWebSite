@@ -1,10 +1,10 @@
 <?php
-
+session_start();
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: PUTCH,GET,POST,PUT,DELETE");
 header("Access-Control-Max-Age: 3600");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+#header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 $method = $_SERVER['REQUEST_METHOD'];
 $formData = getFormData($method);
@@ -15,11 +15,34 @@ $urls = explode('/', $url);
 
 $router = $urls[0];
 $urlData = array_slice($urls, 1);
-include_once 'Controllers/' . $router . '.php';
-route($method, $urlData, $formData);
+//Проверка на наличие аргументов для дальнейшего роутинга
+if(isset($router) and $router!=""){
+    //TODO вынести в отдельный файл, где будет проверяться наличие пути при роутинге
+    try{
+        $file = 'Controllers/' . $router . '.php';
+        if (!file_exists($file)) {
+            throw new Exception ('Твою ж мать!... А куды файл-то делся?');
+        }
+        include_once $file;
+        route($method, $urlData, $formData);
+    }
+    catch(Exception $e){
+        echo 'Такого адреса не существует';
+    }
+   
+}
+else{
+    header('HTTP/1.0 400 Bad Request');
+    echo json_encode(array(
+        'error' => 'Bad Request'
+    ));
+   
+}
 ?>
 
+
 <?php
+//разбиение юрл на маршруты
 function getFormData($method) {    
     if ($method === 'GET') return $_GET;
     if ($method === 'POST' && !empty($_POST)) return $_POST;
@@ -47,3 +70,4 @@ function getFormData($method) {
 }
 
 ?>
+
