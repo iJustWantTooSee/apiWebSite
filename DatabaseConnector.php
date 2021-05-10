@@ -27,7 +27,7 @@ class DatabaseConnector
             $dataFromRow = array();
             for($i = 0; $i< $amount_rows; $i++){
                 $temp_data = mysqli_fetch_row($res);
-                for ($j=0; $j < sizeof($temp_data); $j++) { 
+                for ($j=0; $j < $amountRows; $j++) { 
                     $dataFromRow[]=$temp_data[$j];
                 }
                 $data[]=$dataFromRow;
