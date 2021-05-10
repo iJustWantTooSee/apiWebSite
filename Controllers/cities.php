@@ -4,6 +4,8 @@ use DataBase\DatabaseConnector;
 
 require_once "DatabaseConnector.php";
 $db = new DatabaseConnector();
+
+//куда перенаправляется
 function route($method, $urlData, $formData)
 {
     switch ($method) {
@@ -18,7 +20,7 @@ function route($method, $urlData, $formData)
             break;
     }
 }
-
+//TODO продумать, как лучше сделать разбиение на свичкейсе
 function Get($method, $urlData, $formData){
     switch(sizeof($urlData)){
         case 0:
@@ -48,8 +50,15 @@ function Delete($method, $urlData, $formData){
 
 function OutputCities(){
     global $db;
-    $cities=$db->GetResultsQueries("SELECT Name FROM cities");
-    print_r($cities);
+    $cities=$db->GetResultsQueries("SELECT * FROM cities",2);
+    
+    echo json_encode(array(
+        'HTTP/1.1' => '200 OK',
+        'method' => 'GET',
+        'data' => $cities 
+    )); 
+
+   
 }
 
 ?>

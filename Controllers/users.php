@@ -25,7 +25,18 @@
         global $service;
         switch(sizeof($urlData)){
             case 0:
-                $service->AddUser($method, $urlData, $formData);
+                if($service->AddUser($method, $urlData, $formData)){
+                    header('HTTP/1.0 200 OK');
+                    echo json_encode(array(
+                        'HTTP/1.0' => '200 OK'));
+                }
+                else{
+                    header('HTTP/1.0 400 Bad Request');
+                    echo json_encode(array(
+                        'error' => 'Bad Request'
+    
+                    ));
+                }
                 break;
             case 1:
                 break;
