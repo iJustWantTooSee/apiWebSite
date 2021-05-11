@@ -53,4 +53,26 @@ function Post($method, $urlData, $formData)
             break;
     }
 }
+
+function Get($method, $urlData, $formData)
+{
+    global $service, $serviceLogin;
+    switch (sizeof($urlData)) {
+        case 0:
+            $users = $service->GetUsers();
+            header('HTTP/1.0 200 OK');
+            echo json_encode(array(
+                'users' => $users
+
+            ));
+            break;
+        case 1:
+            break;
+        case 2:
+            break;
+        default:
+            //TODO сделать обработку ошибок
+            break;
+    }
+}
 ?>
