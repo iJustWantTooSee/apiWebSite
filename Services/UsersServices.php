@@ -24,7 +24,7 @@
             else{
                 $query = "INSERT INTO `users`
                 (`Id`, `Name`, `Surname`, `UserName`, `Birthday`, `Avatar`, `Status`, `CityId`, `RoleId`, `Password`)
-                 VALUES (null,'$Name','$Surname','$Username','$Birthday',null,null,null,null,'$Password')";
+                 VALUES (null,'$Name','$Surname','$Username','$Birthday',null,null,null,1,'$Password')";
             }
 
             if(!$db->Insert($query))
