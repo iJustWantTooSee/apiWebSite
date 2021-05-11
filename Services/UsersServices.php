@@ -72,28 +72,30 @@
             return $data;
         }
 
-        function AddAvatar($id, $dir) : bool {
+        function AddAvatar($id, $dir) : array {
             global $db;
+            $user = Array();
             if ($_FILES && $_FILES["filename"]["error"]== UPLOAD_ERR_OK)
             {
+               
                 $name = htmlspecialchars(basename($_FILES["File"]["name"]));
                 $path = "Uploads/$dir/". time() . $name;
                 if(move_uploaded_file($_FILES["File"]["tmp_name"], $path)){
                     $request = "UPDATE `users` SET Avatar = '$path' WHERE Id = $id";
-                    $oldPhotoPath = $db->GetResultsQueries("SELECT Avatar FROM `users` WHERE Id = $id")[0][0];
-                    if($oldPhotoPath != null){
-                        if (!unlink($oldPhotoPath)){
+                    $user = $this->GetSpecifficUser($id);
+                    if($user[0]["Avatar"]  != null){
+                        if (!unlink($user[0]["Avatar"])){
                             echo 'ERROR';
                         }     
                     }
+                    $user[0]["Avatar"] = $path;
                     $db->DB_Request($request);
                 }
                 else{
-                    return false;
+                    echo 'ERROR';
                 }
-               return true;
             }
-            return false;
+            return $user;
         }
     }
 

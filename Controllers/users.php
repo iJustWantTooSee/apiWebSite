@@ -47,6 +47,19 @@ function Post($method, $urlData, $formData)
         case 1:
             break;
         case 2:
+            if (($_SESSION["role"] == "admin" or $_SESSION["user"] == $urlData[0])) {
+                $user = $service->AddAvatar($urlData[0], "Avatars");
+                header('HTTP/1.0 200 OK');
+                echo json_encode(array(
+                    'data' => $user
+                ));
+            } else {
+                header('HTTP/1.0 400 Bad Request');
+                echo json_encode(array(
+                    'error' => 'Bad Request'
+
+                ));
+            }
             break;
         default:
             //TODO сделать обработку ошибок
