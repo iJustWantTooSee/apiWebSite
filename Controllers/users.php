@@ -63,10 +63,24 @@ function Get($method, $urlData, $formData)
             header('HTTP/1.0 200 OK');
             echo json_encode(array(
                 'users' => $users
-
             ));
             break;
         case 1:
+
+            $user = $service->GetSpecifficUser($urlData[0]);
+            if($user == null ){
+                header('HTTP/1.0 400 Bad Request');
+                echo json_encode(array(
+                    'error' => 'User not found'
+
+                ));
+            }else{
+                header('HTTP/1.0 200 OK');
+                echo json_encode(array(
+                    'users' => $user
+                ));
+            }
+           
             break;
         case 2:
             break;
