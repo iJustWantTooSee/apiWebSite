@@ -42,12 +42,11 @@ class DatabaseConnector
         $link->close();
     }
 
-    function Insert($request): bool
+    function DB_Request($request): bool
     {
         $link = $this->GetMySqlLink();
         $result = mysqli_query($link, $request) or die("Ошибка " . mysqli_error($link));
         if (!$result) {
-            echo "Произошла ошибка парсинга";
             return false;
         }
         $link->close();
