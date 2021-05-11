@@ -54,6 +54,23 @@
             }
             return $data;
         }
+
+        function GetSpecifficUser($id) : array {
+            global $db;
+            if($_SESSION['role'] == "admin"){
+                $request = "SELECT Name,Surname,UserName, Birthday ,Avatar, Status, CityId, RoleId
+                FROM users
+                    WHERE Id =$id; ";
+                $data = $db->GetUserInfo($request);
+            }
+            else{
+                $request = "SELECT Name,Surname,UserName,Birthday,Avatar,Status, CityId
+                 FROM users
+                    WHERE Id =$id; ";
+                $data = $db->GetUserInfo($request);
+            }
+            return $data;
+        }
     }
 
 ?>
