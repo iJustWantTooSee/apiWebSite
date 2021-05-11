@@ -19,8 +19,8 @@
          }
          $service->Logout($formData);
          header('HTTP/1.0 200 OK');
-                    echo json_encode(array(
-                        'HTTP/1.0' => '200 OK'));
+         echo json_encode(array(
+             'HTTP/1.0' => '200 OK'));
          #if($service->Logout($formData)){
          #   print_r("Success");
          #}
