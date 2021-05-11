@@ -68,19 +68,18 @@ class DatabaseConnector
             for ($i = 0; $i < $amount_rows; $i++) {
                 $temp_data = mysqli_fetch_assoc($res);
                 foreach ($temp_data as $key => $value) {
-                    if ($key != "RoleId") {
-                       if($key == "CityId" && isset($value)){
-                            $request = "SELECT Name FROM `cities` WHERE Id =" . $value;
-                            $newValue = $this->GetResultsQueries($request);
-                            $dataFromRow[$key] = $newValue[0][0];
-                        }else{
-                            $dataFromRow[$key] = $value;
-                        }   
-                    } elseif ($_SESSION['role'] == "admin") {
+                    if($_SESSION['role'] == "admin" and $key == "Birthday"){
+                        $dataFromRow[$key] = $value;
+                    } else{
+                        if($_SESSION['role'] == "admin" and $key == "RoleId"){
                         $request = "SELECT Name FROM `roles` WHERE Id =" . $value;
                         $newValue = $this->GetResultsQueries($request);
                         $dataFromRow[$key] = $newValue[0][0];
+                        }
                     }
+                    if ($key != "RoleId" and $key != "Birthday") {
+                        $dataFromRow[$key] = $value;  
+                    } 
                 }
                 $data[] = $dataFromRow;
                 $dataFromRow = array();

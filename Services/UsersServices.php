@@ -45,11 +45,11 @@
         function GetUsers() : array {
             global $db;
             if($_SESSION['role'] == "admin"){
-                $request = "SELECT Name,Surname,UserName,Avatar, Status, CityId, RoleId FROM users; ";
+                $request = "SELECT Name,Surname,UserName,Birthday,Avatar, Status, CityId, RoleId FROM users; ";
                 $data = $db->GetUserInfo($request);
             }
             else{
-                $request = "SELECT Name,Surname,UserName,Avatar, Status, CityId FROM users; ";
+                $request = "SELECT Name,Surname,UserName,Birthday,Avatar, Status, CityId FROM users; ";
                 $data = $db->GetUserInfo($request);
             }
             return $data;
