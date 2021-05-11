@@ -1,4 +1,5 @@
 <?php
+session_start();
      require_once $_SERVER['DOCUMENT_ROOT'] . '/Services/LoginServices.php';
      $service = new LoginServices();
      
@@ -16,11 +17,10 @@
              case 'DELETE':
                  break;
          }
-         $service->Login($formData);
-         if($service->Login($formData)){
+         if( $_SESSION["token"] == ""  and $service->Login($formData)){
             header('HTTP/1.0 200 OK');
             echo json_encode(array(
-                'HTTP/1.0' => '200 OK'));
+                'Authorization' => "Bearer " . $_SESSION["token"]));
          }
          else{
             header('HTTP/1.0 400 Bad Request');
