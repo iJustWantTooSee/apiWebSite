@@ -37,6 +37,9 @@ function Get($method, $urlData, $formData)
             GetUser($service, $urlData);
             break;
         case 2:
+            if($urlData[0]=="photos"){
+                GetSelectedUserPhotos($service, $urlData[1]);
+            }
             break;
         default:
             //TODO сделать обработку ошибок
@@ -70,6 +73,22 @@ function GetUser($service, $urlData)
     }
 }
 
+
+function GetSelectedUserPhotos($service, $id){
+    $photos = $service->GetSelectedUserPhotos($id);
+    if ($photos == null) {
+        header('HTTP/1.0 400 Bad Request');
+        echo json_encode(array(
+            'error' => 'User not found'
+
+        ));
+    } else {
+        header('HTTP/1.0 200 OK');
+        echo json_encode(array(
+            'users' => $photos
+        ));
+    }
+}
 
 //TODO продумать, как лучше сделать разбиение на свичкейсе
 function Post($method, $urlData, $formData)

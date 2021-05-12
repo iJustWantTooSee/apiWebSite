@@ -23,11 +23,11 @@ class PhotosServices{
         && in_array($detectedType,$allowedTypes)) {
 
             $name = htmlspecialchars(basename($_FILES["File"]["name"]));
-            $path = "Uploads/$dir/" . time() . $name;
+            $path =  "Uploads/$dir/" . time() . $name;
             if (move_uploaded_file($_FILES["File"]["tmp_name"], $path)) {
-                $request="INSERT INTO `photos`(`Id`, `CreatorId`, `Link`) VALUES (null,$id,'$path')";
+                $request="INSERT INTO `photos`(`Id`, `CreatorId`, `Link`) VALUES (null,$id,'/$path')";
                 $db->DB_Request($request);
-                $request = "SELECT * FROM `photos` WHERE Link = '$path'";
+                $request = "SELECT * FROM `photos` WHERE Link = '/$path'";
                 $data = $db->GetResultsQueriesWithName($request);
             } else {
                 echo 'ERROR';

@@ -76,6 +76,12 @@ class UsersServices
         return $data;
     }
 
+    function GetSelectedUserPhotos($id) : array{
+        global $db;
+        $request = "SELECT * FROM `photos` WHERE CreatorId=$id";
+        return $db->GetResultsQueriesWithName($request);
+    }
+
     function AddAvatar($id, $dir): array
     {
         global $db;
@@ -88,7 +94,7 @@ class UsersServices
             $name = htmlspecialchars(basename($_FILES["File"]["name"]));
             $path = "Uploads/$dir/" . time() . $name;
             if (move_uploaded_file($_FILES["File"]["tmp_name"], $path)) {
-                $request = "UPDATE `users` SET Avatar = '$path' WHERE Id = $id";
+                $request = "UPDATE `users` SET Avatar = '/$path' WHERE Id = $id";
                 $user = $this->GetSpecifficUser($id);
                 if ($user[0]["Avatar"]  != null) {
                     if (!unlink($user[0]["Avatar"])) {
@@ -96,7 +102,7 @@ class UsersServices
                     }
                 }
                 $user[0]["Status"] = UserStatus::$status[$user[0]["Status"]];
-                $user[0]["Avatar"] = $path;
+                $user[0]["Avatar"] = "/" . $path;
                 $db->DB_Request($request);
             } else {
                 echo 'ERROR';
