@@ -1,10 +1,10 @@
 <?php
 
 use DataBase\DatabaseConnector;
-
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Services/CitiesServices.php';
 require_once "DatabaseConnector.php";
+$service = new CitiesServices();
 $db = new DatabaseConnector();
-
 //куда перенаправляется
 function route($method, $urlData, $formData)
 {
@@ -22,11 +22,13 @@ function route($method, $urlData, $formData)
 }
 //TODO продумать, как лучше сделать разбиение на свичкейсе
 function Get($method, $urlData, $formData){
+    global $service;
     switch(sizeof($urlData)){
         case 0:
             OutputCities();
             break;
         case 1:
+            OutputSelectedCity($service, $urlData[0]);
             break;
         case 2:
             break;
@@ -57,8 +59,22 @@ function OutputCities(){
         'method' => 'GET',
         'data' => $cities 
     )); 
+}
 
-   
+function OutputSelectedCity($service, $CityId){
+    $city = $service->GetSelectedCity($CityId);
+    if ($city){
+        header('HTTP/1.0 200 OK');
+        echo json_encode(array(
+            'HTTP/1.0' => $city
+        ));
+    } else {
+        header('HTTP/1.0 400 Bad Request');
+        echo json_encode(array(
+            'error' => 'City Not Found'
+
+        ));
+    }
 }
 
 ?>

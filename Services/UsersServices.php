@@ -110,7 +110,7 @@
             $request ="SELECT Id,Name,Surname,UserName,Password,Birthday,Avatar,Status, CityId
             FROM users
                WHERE Id =$id; ";
-            $user = $db->GetUserInfoForAdminAndUser($request);
+            $user = $db->GetResultsQueriesWithName($request);
             $newRequest = 'UPDATE `users` SET ';
             if($Name != ""){
                 $newRequest .="Name='$Name', ";

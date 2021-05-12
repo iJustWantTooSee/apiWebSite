@@ -88,8 +88,8 @@ class DatabaseConnector
         }
         $link->close();
     }
-
-    function GetUserInfoForAdminAndUser($request): array
+    
+    function GetResultsQueriesWithName($request): array
     {
         $link = $this->GetMySqlLink();
         $res = mysqli_query($link, $request) or die("Ошибка " . mysqli_error($link));
