@@ -31,6 +31,7 @@ function Get($method, $urlData, $formData){
             OutputSelectedCity($service, $urlData[0]);
             break;
         case 2:
+            OutputPeopleFromCity($service, $urlData[0]);
             break;
         default:
         //TODO сделать обработку ошибок
@@ -72,7 +73,21 @@ function OutputSelectedCity($service, $CityId){
         header('HTTP/1.0 400 Bad Request');
         echo json_encode(array(
             'error' => 'City Not Found'
+        ));
+    }
+}
 
+function OutputPeopleFromCity($service, $cityId){
+    $people = $service->OutputPeopleFromCity($cityId);
+    if ($people){
+        header('HTTP/1.0 200 OK');
+        echo json_encode(array(
+            'HTTP/1.0' => $people
+        ));
+    } else {
+        header('HTTP/1.0 400 Bad Request');
+        echo json_encode(array(
+            'error' => 'City Not Found'
         ));
     }
 }
