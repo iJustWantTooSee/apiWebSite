@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 use DataBase\DatabaseConnector;
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Services/RolesServices.php';
 require_once "DatabaseConnector.php";

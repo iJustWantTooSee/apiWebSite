@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Services/UsersServices.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Services/LoginServices.php';

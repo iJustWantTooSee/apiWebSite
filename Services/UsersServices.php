@@ -80,7 +80,10 @@ class UsersServices
     {
         global $db;
         $user = array();
-        if ($_FILES && $_FILES["filename"]["error"] == UPLOAD_ERR_OK) {
+        $allowedTypes = array(IMAGETYPE_PNG, IMAGETYPE_JPEG, IMAGETYPE_GIF);
+        $detectedType = exif_imagetype($_FILES['File']['tmp_name']);
+        if ($_FILES && $_FILES["filename"]["error"] == UPLOAD_ERR_OK 
+        && in_array($detectedType,$allowedTypes)) {
 
             $name = htmlspecialchars(basename($_FILES["File"]["name"]));
             $path = "Uploads/$dir/" . time() . $name;
