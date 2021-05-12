@@ -60,5 +60,13 @@ class CitiesServices
             return false;
         return true;
     }
+
+    function DeleteCity($id):bool{
+        global $db;
+        $query = "DELETE FROM `cities` WHERE Id = '$id'";
+        if (!$db->DB_Request($query))
+            return false;
+        return true;
+    }
 }
 ?>
