@@ -13,8 +13,10 @@ function route($method, $urlData, $formData)
             Get($method, $urlData, $formData);
             break;
         case 'POST':
+            Post($method, $urlData, $formData);
             break;
         case 'PATCH':
+            Patch($method, $urlData, $formData);
             break;
         case 'DELETE':
             break;
@@ -40,11 +42,38 @@ function Get($method, $urlData, $formData){
 }
 
 function Post($method, $urlData, $formData){
-
+    global $service;
+    switch(sizeof($urlData)){
+        case 0:
+            AddCity($service, $formData["Name"]);
+            break;
+        case 1:
+           
+            break;
+        case 2:
+           
+            break;
+        default:
+        //TODO сделать обработку ошибок
+            break;
+    }
 }
 
 function Patch($method, $urlData, $formData){
-
+    global $service;
+    switch(sizeof($urlData)){
+        case 0:
+            break;
+        case 1:
+            EditCity($service, $urlData[0] ,$formData["Name"]);
+            break;
+        case 2:
+           
+            break;
+        default:
+        //TODO сделать обработку ошибок
+            break;
+    }
 }
 
 function Delete($method, $urlData, $formData){
@@ -88,6 +117,34 @@ function OutputPeopleFromCity($service, $cityId){
         header('HTTP/1.0 400 Bad Request');
         echo json_encode(array(
             'error' => 'City Not Found'
+        ));
+    }
+}
+
+function  AddCity($service, $name){
+    if ($_SESSION["role"] == "admin" and $service->AddCity($name)){
+        header('HTTP/1.0 200 OK');
+        echo json_encode(array(
+            'HTTP/1.0' => "200 OK"
+        ));
+    } else {
+        header('HTTP/1.0 400 Bad Request');
+        echo json_encode(array(
+            'error' => 'Bad Request'
+        ));
+    }
+}
+
+function EditCity($service,$id ,$name){
+    if ($_SESSION["role"] == "admin" and $service->EditCity($id,$name)){
+        header('HTTP/1.0 200 OK');
+        echo json_encode(array(
+            'HTTP/1.0' => "200 OK"
+        ));
+    } else {
+        header('HTTP/1.0 400 Bad Request');
+        echo json_encode(array(
+            'error' => 'Bad Request'
         ));
     }
 }
