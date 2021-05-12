@@ -155,6 +155,16 @@
             return $user;
         }
 
+        function SetUserCity($id, $formData){
+            global $db;
+            $MySqlLink= $db->GetMySqlLink();
+            $CityId = htmlentities(mysqli_real_escape_string($MySqlLink,$formData["CityId"])); 
+            $request = "UPDATE `users` SET CityId = '$CityId' WHERE Id = $id";
+            if (!$db->DB_Request($request)){
+                return false;
+            }
+            return true;
+        }
     }
 
 ?>

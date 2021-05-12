@@ -120,12 +120,18 @@ function Patch($method, $urlData, $formData)
     global $service, $serviceLogin;
     switch (sizeof($urlData)) {
         case 0:
-           
             break;
         case 1:
             EditUser($service,$urlData, $formData);
             break;
         case 2:
+            switch($urlData[1]){
+                case "city":
+                    SetUserCity($service,$urlData, $formData);
+                    break;
+                default:
+                break;
+            }
             break;
         default:
             //TODO сделать обработку ошибок
@@ -139,6 +145,23 @@ function EditUser($service, $urlData, $formData){
         header('HTTP/1.0 200 OK');
         echo json_encode(array(
             'user' => $user
+        ));
+    } else {
+        header('HTTP/1.0 400 Bad Request');
+        echo json_encode(array(
+            'error' => 'Bad Request'
+
+        ));
+    }
+}
+
+function SetUserCity($service, $urlData, $formData){
+    if (($_SESSION["role"] == "admin" or $_SESSION["user"] == $urlData[0])
+         and $service->SetUserCity($urlData[0],$formData)) {
+       
+        header('HTTP/1.0 200 OK');
+        echo json_encode(array(
+            'HTTP/1.0' => '200 OK'
         ));
     } else {
         header('HTTP/1.0 400 Bad Request');
