@@ -188,6 +188,15 @@
             return true;
         }
 
+        function DeleteUser($id) : bool{
+            global $db;
+            $request = "DELETE FROM `users` WHERE Id = $id";
+            if (!$db->DB_Request($request)){
+                return false;
+            }
+            return true;
+        }
+
     }
 
 ?>

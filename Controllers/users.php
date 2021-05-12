@@ -19,6 +19,7 @@ function route($method, $urlData, $formData)
             Patch($method, $urlData, $formData);
             break;
         case 'DELETE':
+            Delete($method, $urlData, $formData);
             break;
     }
 }
@@ -219,4 +220,20 @@ function SetUserRole($service, $urlData, $formData)
     }
 }
 
+
+function Delete($service, $urlData, $formData){
+    global $service, $serviceLogin;
+    if ($_SESSION["role"] == "admin"  and $service->DeleteUser($urlData[0])){
+        header('HTTP/1.0 200 OK');
+        echo json_encode(array(
+            'HTTP/1.0' => '200 OK'
+        ));
+    } else {
+        header('HTTP/1.0 400 Bad Request');
+        echo json_encode(array(
+            'error' => 'Bad Request'
+
+        ));
+    }
+}
 ?>
