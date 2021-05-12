@@ -48,7 +48,7 @@ function getFormData($method) {
     if ($method === 'POST' && !empty($_POST)) return $_POST;
 
     $incomingData = file_get_contents('php://input');
-    $decodedJSON = json_decode($incomingData); 
+    $decodedJSON = json_decode($incomingData, true); 
     if ($decodedJSON) 
     {
         $data = $decodedJSON;
