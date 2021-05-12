@@ -92,6 +92,22 @@ function Patch($method, $urlData, $formData){
     }
 }
 
+function Delete($method, $urlData, $formData){
+    global $servicePhotos;
+    if($servicePhotos->DeletePhoto($urlData[0])){
+        header('HTTP/1.0 200 OK');
+        echo json_encode(array(
+            'HTTP/1.0' => '200 OK'
+        ));
+    }
+    else{
+        header('HTTP/1.0 400 Bad Request');
+        echo json_encode(array(
+            'error' => 'Bad Request'
+        ));
+    }
+}
+
 function AddPhoto($service, $urlData, $formData){
     if($_SESSION['user']!="" and isset($_SESSION['user'])){
         $photo = $service->AddPhoto($_SESSION['user'], "Photos");

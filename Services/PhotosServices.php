@@ -36,4 +36,20 @@ class PhotosServices{
         return $data;
     }
 
+    function DeletePhoto($photoId):bool{
+        global $db;
+        $request = "SELECT CreatorId, Link FROM `photos` WHERE Id=$photoId";
+        $data=$db->GetResultsQueries($request,2);
+        if($_SESSION['role']=="admin" or $_SESSION['user']==$data[0][0]){
+            $path = substr($data[0][1],1);
+            if(!unlink($path)){
+                return false;
+            }
+            $request="DELETE FROM `photos` WHERE Id=$photoId";
+            $db->DB_Request($request);
+            return true;
+        }
+        return false;
+    }
+
 }
