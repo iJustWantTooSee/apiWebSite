@@ -16,11 +16,58 @@ function route($method, $urlData, $formData)
             Post($method, $urlData, $formData);
             break;
         case 'PATCH':
+            Patch($method, $urlData, $formData);
             break;
         case 'DELETE':
             break;
     }
 }
+
+
+function Get($method, $urlData, $formData)
+{
+    global $service, $serviceLogin;
+    switch (sizeof($urlData)) {
+        case 0:
+            GetAllUser($service);
+            break;
+        case 1:
+            GetUser($service, $urlData);
+            break;
+        case 2:
+            break;
+        default:
+            //TODO сделать обработку ошибок
+            break;
+    }
+}
+
+function GetAllUser($service)
+{
+    $users = $service->GetUsers();
+    header('HTTP/1.0 200 OK');
+    echo json_encode(array(
+        'users' => $users
+    ));
+}
+
+function GetUser($service, $urlData)
+{
+    $user = $service->GetSpecifficUser($urlData[0]);
+    if ($user == null) {
+        header('HTTP/1.0 400 Bad Request');
+        echo json_encode(array(
+            'error' => 'User not found'
+
+        ));
+    } else {
+        header('HTTP/1.0 200 OK');
+        echo json_encode(array(
+            'users' => $user
+        ));
+    }
+}
+
 
 //TODO продумать, как лучше сделать разбиение на свичкейсе
 function Post($method, $urlData, $formData)
@@ -67,33 +114,16 @@ function Post($method, $urlData, $formData)
     }
 }
 
-function Get($method, $urlData, $formData)
+
+function Patch($method, $urlData, $formData)
 {
     global $service, $serviceLogin;
     switch (sizeof($urlData)) {
         case 0:
-            $users = $service->GetUsers();
-            header('HTTP/1.0 200 OK');
-            echo json_encode(array(
-                'users' => $users
-            ));
+           
             break;
         case 1:
-
-            $user = $service->GetSpecifficUser($urlData[0]);
-            if($user == null ){
-                header('HTTP/1.0 400 Bad Request');
-                echo json_encode(array(
-                    'error' => 'User not found'
-
-                ));
-            }else{
-                header('HTTP/1.0 200 OK');
-                echo json_encode(array(
-                    'users' => $user
-                ));
-            }
-           
+            EditUser($service,$urlData, $formData);
             break;
         case 2:
             break;
@@ -102,4 +132,19 @@ function Get($method, $urlData, $formData)
             break;
     }
 }
-?>
+
+function EditUser($service, $urlData, $formData){
+    if (($_SESSION["role"] == "admin" or $_SESSION["user"] == $urlData[0])) {
+        $user = $service->EditUser($urlData[0],$formData);
+        header('HTTP/1.0 200 OK');
+        echo json_encode(array(
+            'user' => $user
+        ));
+    } else {
+        header('HTTP/1.0 400 Bad Request');
+        echo json_encode(array(
+            'error' => 'Bad Request'
+
+        ));
+    }
+}
