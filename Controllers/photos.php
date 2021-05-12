@@ -3,7 +3,7 @@ session_start();
 use DataBase\DatabaseConnector;
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Services/PhotosServices.php';
 require_once "DatabaseConnector.php";
-$servicePhotos = new CitiesServices();
+$servicePhotos = new PhotosServices();
 $db = new DatabaseConnector();
 //куда перенаправляется
 function route($method, $urlData, $formData)
@@ -43,10 +43,10 @@ function Get($method, $urlData, $formData){
 }
 
 function Post($method, $urlData, $formData){
-    global $serviceCity;
+    global $servicePhotos;
     switch(sizeof($urlData)){
         case 0:
-           
+            AddPhoto($servicePhotos, $urlData, $formData);
             break;
         case 1:
            
@@ -76,6 +76,20 @@ function Patch($method, $urlData, $formData){
     }
 }
 
-
+function AddPhoto($service, $urlData, $formData){
+    if($_SESSION['user']!="" and isset($_SESSION['user'])){
+        $photo = $service->AddPhoto($_SESSION['user'], "Photos");
+        header('HTTP/1.0 200 OK');
+        echo json_encode(array(
+            'photo' => $photo
+        ));
+    }
+    else{
+        header('HTTP/1.0 400 Bad Request');
+        echo json_encode(array(
+            'error' => 'Bad Request'
+        ));
+    }
+}
 
 ?>
