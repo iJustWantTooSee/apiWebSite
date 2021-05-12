@@ -155,7 +155,7 @@
             return $user;
         }
 
-        function SetUserCity($id, $formData){
+        function SetUserCity($id, $formData):bool{
             global $db;
             $MySqlLink= $db->GetMySqlLink();
             $CityId = htmlentities(mysqli_real_escape_string($MySqlLink,$formData["CityId"])); 
@@ -165,6 +165,29 @@
             }
             return true;
         }
+
+        function SetUserStatus($id, $formData):bool{
+            global $db;
+            $MySqlLink= $db->GetMySqlLink();
+            $Status = htmlentities(mysqli_real_escape_string($MySqlLink,$formData["Status"])); 
+            $request = "UPDATE `users` SET Status = '$Status' WHERE Id = $id";
+            if (!$db->DB_Request($request)){
+                return false;
+            }
+            return true;
+        }
+
+        function SetUserRole($id, $formData):bool{
+            global $db;
+            $MySqlLink= $db->GetMySqlLink();
+            $RoleId = htmlentities(mysqli_real_escape_string($MySqlLink,$formData["RoleId"])); 
+            $request = "UPDATE `users` SET RoleId = '$RoleId' WHERE Id = $id";
+            if (!$db->DB_Request($request)){
+                return false;
+            }
+            return true;
+        }
+
     }
 
 ?>

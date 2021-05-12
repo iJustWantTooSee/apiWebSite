@@ -122,15 +122,21 @@ function Patch($method, $urlData, $formData)
         case 0:
             break;
         case 1:
-            EditUser($service,$urlData, $formData);
+            EditUser($service, $urlData, $formData);
             break;
         case 2:
-            switch($urlData[1]){
+            switch ($urlData[1]) {
                 case "city":
-                    SetUserCity($service,$urlData, $formData);
+                    SetUserCity($service, $urlData, $formData);
+                    break;
+                case "status":
+                    SetUserStatus($service, $urlData, $formData);
+                    break;
+                case "role":
+                    SetUserRole($service, $urlData, $formData);
                     break;
                 default:
-                break;
+                    break;
             }
             break;
         default:
@@ -139,9 +145,10 @@ function Patch($method, $urlData, $formData)
     }
 }
 
-function EditUser($service, $urlData, $formData){
+function EditUser($service, $urlData, $formData)
+{
     if (($_SESSION["role"] == "admin" or $_SESSION["user"] == $urlData[0])) {
-        $user = $service->EditUser($urlData[0],$formData);
+        $user = $service->EditUser($urlData[0], $formData);
         header('HTTP/1.0 200 OK');
         echo json_encode(array(
             'user' => $user
@@ -155,10 +162,12 @@ function EditUser($service, $urlData, $formData){
     }
 }
 
-function SetUserCity($service, $urlData, $formData){
+function SetUserCity($service, $urlData, $formData)
+{
     if (($_SESSION["role"] == "admin" or $_SESSION["user"] == $urlData[0])
-         and $service->SetUserCity($urlData[0],$formData)) {
-       
+        and $service->SetUserCity($urlData[0], $formData)
+    ) {
+
         header('HTTP/1.0 200 OK');
         echo json_encode(array(
             'HTTP/1.0' => '200 OK'
@@ -171,3 +180,43 @@ function SetUserCity($service, $urlData, $formData){
         ));
     }
 }
+
+function SetUserStatus($service, $urlData, $formData)
+{
+    if (($_SESSION["role"] == "admin" or $_SESSION["user"] == $urlData[0])
+        and $service->SetUserStatus($urlData[0], $formData)
+    ) {
+
+        header('HTTP/1.0 200 OK');
+        echo json_encode(array(
+            'HTTP/1.0' => '200 OK'
+        ));
+    } else {
+        header('HTTP/1.0 400 Bad Request');
+        echo json_encode(array(
+            'error' => 'Bad Request'
+
+        ));
+    }
+}
+
+function SetUserRole($service, $urlData, $formData)
+{
+    if (($_SESSION["role"] == "admin" or $_SESSION["user"] == $urlData[0])
+        and $service->SetUserRole($urlData[0], $formData)
+    ) {
+
+        header('HTTP/1.0 200 OK');
+        echo json_encode(array(
+            'HTTP/1.0' => '200 OK'
+        ));
+    } else {
+        header('HTTP/1.0 400 Bad Request');
+        echo json_encode(array(
+            'error' => 'Bad Request'
+
+        ));
+    }
+}
+
+?>
