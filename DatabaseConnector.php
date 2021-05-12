@@ -1,11 +1,11 @@
 <?php
 
 namespace DataBase;
-
+use enums\UserStatus;
 use mysqli;
 
 require_once 'C:\viktor\key\connection.php';
-
+require_once "Enums/Status.php";
 class DatabaseConnector
 {
     function GetMySqlLink(): mysqli
@@ -77,7 +77,17 @@ class DatabaseConnector
                         }
                     }
                     if ($key != "RoleId" and $key != "Birthday") {
-                        $dataFromRow[$key] = $value;
+                        if($key=="Status" and $value!=null){
+                            $dataFromRow[$key] = UserStatus::$status[$value];
+                        }
+                        else{
+                            if($key=="CityId" and $value!=null){
+                                $dataFromRow[$key] = $this->GetResultsQueries("SELECT Name FROM `cities` WHERE Id = $value")[0][0];
+                            }
+                            else{
+                                $dataFromRow[$key] = $value;
+                            }
+                        }
                     }
                 }
                 $data[] = $dataFromRow;
