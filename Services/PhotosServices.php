@@ -5,6 +5,15 @@ require_once "DatabaseConnector.php";
 $db = new DatabaseConnector();
 
 class PhotosServices{
+
+    function OutputPhotos($userId){
+        global $db;
+        $data = array();
+        $request = "SELECT * FROM `photos` WHERE CreatorId=$userId";
+        $data = $db->GetResultsQueriesWithName($request);
+        return $data;
+    }
+
     function AddPhoto($id, $dir):array{
         global $db;
         $data = array();

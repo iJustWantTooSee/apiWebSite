@@ -25,10 +25,10 @@ function route($method, $urlData, $formData)
 }
 //TODO продумать, как лучше сделать разбиение на свичкейсе
 function Get($method, $urlData, $formData){
-    global $serviceCity;
+    global $servicePhotos;
     switch(sizeof($urlData)){
         case 0:
-           
+            OutputPhotos($servicePhotos);
             break;
         case 1:
          
@@ -39,6 +39,22 @@ function Get($method, $urlData, $formData){
         default:
         //TODO сделать обработку ошибок
             break;
+    }
+}
+
+function OutputPhotos($service){
+    if($_SESSION['user']!="" and isset($_SESSION['user'])){
+        $photo = $service->OutputPhotos($_SESSION['user']);
+        header('HTTP/1.0 200 OK');
+        echo json_encode(array(
+            'photo' => $photo
+        ));
+    }
+    else{
+        header('HTTP/1.0 400 Bad Request');
+        echo json_encode(array(
+            'error' => 'Bad Request'
+        ));
     }
 }
 
@@ -61,7 +77,7 @@ function Post($method, $urlData, $formData){
 }
 
 function Patch($method, $urlData, $formData){
-    global $serviceCity;
+    global $servicePhotos;
     switch(sizeof($urlData)){
         case 0:
             break;
