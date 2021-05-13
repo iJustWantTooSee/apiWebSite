@@ -82,6 +82,25 @@ class UsersServices
         return $db->GetResultsQueriesWithName($request);
     }
 
+    function SendMessage($creatorId, $userId, $text)
+    {
+        global $db;
+        $request = "SELECT MAX(Id) FROM `messages`";
+        $maxId = $db->GetResultsQueries($request)[0][0]+1;
+        $request = "INSERT INTO `messages`(`Id`, `Text`, `Date`, `UserId`, `CreatorId`)
+         VALUES ($maxId,'$text',NOW(),$userId,$creatorId)";
+
+        return  $maxId;
+    }
+
+    function GetUserMessages($creatorId,$userId, $offset,$limit){
+        global $db;
+        $request = "SELECT * FROM `messages`
+         WHERE (CreatorId = $creatorId AND UserId = $userId)
+             OR (CreatorId = $userId AND UserId = $creatorId) LIMIT $limit OFFSET $offset";
+        return $db->GetResultsQueriesWithName($request);
+    }
+
     function AddAvatar($id, $dir): array
     {
         global $db;

@@ -43,10 +43,39 @@ function Get($method, $urlData, $formData)
             if ($urlData[1] == "posts"){
                 GetUserPosts($service, $urlData[0]);
             }
+            if($urlData[1]=="messages"){
+                GetUserMessages($service, $urlData[0] ,$formData["offset"],$formData["limit"]);
+            }
             break;
         default:
             //TODO сделать обработку ошибок
             break;
+    }
+}
+
+function GetUserMessages($service,$userId, $offset,$limit){
+    if ($_SESSION["user"]!="" and isset($_SESSION['user'])){
+        if($limit == 0 or $limit >100){
+            $limit=100;
+        }
+        $messages = $service->GetUserMessages($_SESSION["user"],$userId, $offset,$limit);
+        if ($messages) {
+            header('HTTP/1.0 200 OK');
+            echo json_encode(array(
+                'HTTP/1.0' => $messages
+            ));
+        } else {
+            header('HTTP/1.0 200 OK');
+            echo json_encode(array(
+                'messages' => 'Not Found'
+            ));
+        }
+    }
+    else{
+        header('HTTP/1.0 400 Bad Request');
+        echo json_encode(array(
+            'error' => 'Bad Request'
+        ));
     }
 }
 
@@ -134,18 +163,23 @@ function Post($method, $urlData, $formData)
         case 1:
             break;
         case 2:
-            if (($_SESSION["role"] == "admin" or $_SESSION["user"] == $urlData[0])) {
-                $user = $service->AddAvatar($urlData[0], "Avatars");
-                header('HTTP/1.0 200 OK');
-                echo json_encode(array(
-                    'data' => $user
-                ));
-            } else {
-                header('HTTP/1.0 400 Bad Request');
-                echo json_encode(array(
-                    'error' => 'Bad Request'
-
-                ));
+            if($urlData[1] == "avatar"){
+                if (($_SESSION["role"] == "admin" or $_SESSION["user"] == $urlData[0])) {
+                    $user = $service->AddAvatar($urlData[0], "Avatars");
+                    header('HTTP/1.0 200 OK');
+                    echo json_encode(array(
+                        'data' => $user
+                    ));
+                } else {
+                    header('HTTP/1.0 400 Bad Request');
+                    echo json_encode(array(
+                        'error' => 'Bad Request'
+    
+                    ));
+                }
+            }
+            if($urlData[1] == "messages"){
+                SendMessage($service, $urlData[0], $formData["Text"]);
             }
             break;
         default:
@@ -154,6 +188,20 @@ function Post($method, $urlData, $formData)
     }
 }
 
+function SendMessage($service, $userId, $text){
+    if ($_SESSION["user"] != "" and isset($_SESSION["user"])){
+        $messageId =  $service->SendMessage($_SESSION['user'], $userId, $text);
+        header('HTTP/1.0 200 OK');
+        echo json_encode(array(
+            'Id' => $messageId
+        ));
+    } else {
+        header('HTTP/1.0 400 Bad Request');
+        echo json_encode(array(
+            'error' => 'Bad Request'
+        ));
+    }
+}
 
 function Patch($method, $urlData, $formData)
 {
