@@ -40,6 +40,9 @@ function Get($method, $urlData, $formData)
             if($urlData[0]=="photos"){
                 GetSelectedUserPhotos($service, $urlData[1]);
             }
+            if ($urlData[1] == "posts"){
+                GetUserPosts($service, $urlData[0]);
+            }
             break;
         default:
             //TODO сделать обработку ошибок
@@ -86,6 +89,22 @@ function GetSelectedUserPhotos($service, $id){
         header('HTTP/1.0 200 OK');
         echo json_encode(array(
             'users' => $photos
+        ));
+    }
+}
+
+function GetUserPosts($service, $userId){
+    $posts = $service->GetUserPosts($userId);
+    if ($posts == null) {
+        header('HTTP/1.0 400 Bad Request');
+        echo json_encode(array(
+            'error' => 'Posts not found'
+
+        ));
+    } else {
+        header('HTTP/1.0 200 OK');
+        echo json_encode(array(
+            'users' => $posts
         ));
     }
 }

@@ -111,6 +111,12 @@ class UsersServices
         return $user;
     }
 
+    function GetUserPosts($UserId) :array{
+        global $db;
+        $request = "SELECT * FROM `posts` WHERE UserId=$UserId";
+        return $db->GetResultsQueriesWithName($request);
+    }
+
     function EditUser($id, $formData)
     {
         global $db;
