@@ -22,13 +22,16 @@ function route($method, $urlData, $formData)
         case 'DELETE':
             Delete($method, $urlData, $formData);
             break;
+        default:
+            header('HTTP/1.0 501 Not Implemented');
+            break;
     }
 }
 
 
 function Get($method, $urlData, $formData)
 {
-    global $service, $serviceLogin;
+    global $service;
     switch (sizeof($urlData)) {
         case 0:
             GetAllUser($service);
@@ -37,45 +40,35 @@ function Get($method, $urlData, $formData)
             GetUser($service, $urlData);
             break;
         case 2:
-            if($urlData[0]=="photos"){
+            if ($urlData[0] == "photos") {
                 GetSelectedUserPhotos($service, $urlData[1]);
             }
-            if ($urlData[1] == "posts"){
+            if ($urlData[1] == "posts") {
                 GetUserPosts($service, $urlData[0]);
             }
-            if($urlData[1]=="messages"){
-                GetUserMessages($service, $urlData[0] ,$formData["offset"],$formData["limit"]);
+            if ($urlData[1] == "messages") {
+                GetUserMessages($service, $urlData[0], $formData["offset"], $formData["limit"]);
             }
             break;
         default:
-            //TODO сделать обработку ошибок
+            header('HTTP/1.0 501 Not Implemented');
             break;
     }
 }
 
-function GetUserMessages($service,$userId, $offset,$limit){
-    if ($_SESSION["user"]!="" and isset($_SESSION['user'])){
-        if($limit == 0 or $limit >100){
-            $limit=100;
+function GetUserMessages($service, $userId, $offset, $limit)
+{
+    if ($_SESSION["user"] != "" and isset($_SESSION['user'])) {
+        if ($limit == 0 or $limit > 100) {
+            $limit = 100;
         }
-        $messages = $service->GetUserMessages($_SESSION["user"],$userId, $offset,$limit);
-        if ($messages) {
-            header('HTTP/1.0 200 OK');
-            echo json_encode(array(
-                'HTTP/1.0' => $messages
-            ));
-        } else {
-            header('HTTP/1.0 200 OK');
-            echo json_encode(array(
-                'messages' => 'Not Found'
-            ));
-        }
-    }
-    else{
-        header('HTTP/1.0 400 Bad Request');
+        $messages = $service->GetUserMessages($_SESSION["user"], $userId, $offset, $limit);
+        header('HTTP/1.0 200 OK');
         echo json_encode(array(
-            'error' => 'Bad Request'
+            'messages' => $messages
         ));
+    } else {
+        header('HTTP/1.0 403 Forbidden');
     }
 }
 
@@ -91,51 +84,31 @@ function GetAllUser($service)
 function GetUser($service, $urlData)
 {
     $user = $service->GetSpecifficUser($urlData[0]);
-    if ($user == null) {
-        header('HTTP/1.0 400 Bad Request');
-        echo json_encode(array(
-            'error' => 'User not found'
-
-        ));
-    } else {
-        header('HTTP/1.0 200 OK');
-        echo json_encode(array(
-            'users' => $user
-        ));
-    }
+    header('HTTP/1.0 200 OK');
+    echo json_encode(array(
+        'users' => $user
+    ));
 }
 
 
-function GetSelectedUserPhotos($service, $id){
+function GetSelectedUserPhotos($service, $id)
+{
     $photos = $service->GetSelectedUserPhotos($id);
-    if ($photos == null) {
-        header('HTTP/1.0 400 Bad Request');
-        echo json_encode(array(
-            'error' => 'User not found'
 
-        ));
-    } else {
-        header('HTTP/1.0 200 OK');
-        echo json_encode(array(
-            'users' => $photos
-        ));
-    }
+    header('HTTP/1.0 200 OK');
+    echo json_encode(array(
+        'users' => $photos
+    ));
 }
 
-function GetUserPosts($service, $userId){
+function GetUserPosts($service, $userId)
+{
     $posts = $service->GetUserPosts($userId);
-    if ($posts == null) {
-        header('HTTP/1.0 400 Bad Request');
-        echo json_encode(array(
-            'error' => 'Posts not found'
 
-        ));
-    } else {
-        header('HTTP/1.0 200 OK');
-        echo json_encode(array(
-            'users' => $posts
-        ));
-    }
+    header('HTTP/1.0 200 OK');
+    echo json_encode(array(
+        'posts' => $posts
+    ));
 }
 
 //TODO продумать, как лучше сделать разбиение на свичкейсе
@@ -154,42 +127,38 @@ function Post($method, $urlData, $formData)
                 ));
             } else {
                 header('HTTP/1.0 400 Bad Request');
-                echo json_encode(array(
-                    'error' => 'Bad Request'
-
-                ));
             }
             break;
-        case 1:
-            break;
         case 2:
-            if($urlData[1] == "avatar"){
+            if ($urlData[1] == "avatar") {
                 if (($_SESSION["role"] == "admin" or $_SESSION["user"] == $urlData[0])) {
                     $user = $service->AddAvatar($urlData[0], "Avatars");
                     header('HTTP/1.0 200 OK');
                     echo json_encode(array(
-                        'data' => $user
+                        'user' => $user
                     ));
                 } else {
                     header('HTTP/1.0 400 Bad Request');
-                    echo json_encode(array(
-                        'error' => 'Bad Request'
-    
-                    ));
                 }
             }
-            if($urlData[1] == "messages"){
-                SendMessage($service, $urlData[0], $formData["Text"]);
+            else{
+                if ($urlData[1] == "messages") {
+                    SendMessage($service, $urlData[0], $formData["message"]);
+                }
+                else{
+                    header('HTTP/1.0 400 Bad Request');
+                }
             }
             break;
         default:
-            //TODO сделать обработку ошибок
+            header('HTTP/1.0 501 Not Implemented');
             break;
     }
 }
 
-function SendMessage($service, $userId, $text){
-    if ($_SESSION["user"] != "" and isset($_SESSION["user"])){
+function SendMessage($service, $userId, $text)
+{
+    if ($_SESSION["user"] != "" and isset($_SESSION["user"])) {
         $messageId =  $service->SendMessage($_SESSION['user'], $userId, $text);
         header('HTTP/1.0 200 OK');
         echo json_encode(array(
@@ -197,9 +166,6 @@ function SendMessage($service, $userId, $text){
         ));
     } else {
         header('HTTP/1.0 400 Bad Request');
-        echo json_encode(array(
-            'error' => 'Bad Request'
-        ));
     }
 }
 
@@ -207,8 +173,6 @@ function Patch($method, $urlData, $formData)
 {
     global $service, $serviceLogin;
     switch (sizeof($urlData)) {
-        case 0:
-            break;
         case 1:
             EditUser($service, $urlData, $formData);
             break;
@@ -224,11 +188,12 @@ function Patch($method, $urlData, $formData)
                     SetUserRole($service, $urlData, $formData);
                     break;
                 default:
+                    header('HTTP/1.0 501 Not Implemented');
                     break;
             }
             break;
         default:
-            //TODO сделать обработку ошибок
+            header('HTTP/1.0 501 Not Implemented');
             break;
     }
 }
@@ -243,10 +208,6 @@ function EditUser($service, $urlData, $formData)
         ));
     } else {
         header('HTTP/1.0 400 Bad Request');
-        echo json_encode(array(
-            'error' => 'Bad Request'
-
-        ));
     }
 }
 
@@ -255,17 +216,12 @@ function SetUserCity($service, $urlData, $formData)
     if (($_SESSION["role"] == "admin" or $_SESSION["user"] == $urlData[0])
         and $service->SetUserCity($urlData[0], $formData)
     ) {
-
         header('HTTP/1.0 200 OK');
         echo json_encode(array(
             'HTTP/1.0' => '200 OK'
         ));
     } else {
         header('HTTP/1.0 400 Bad Request');
-        echo json_encode(array(
-            'error' => 'Bad Request'
-
-        ));
     }
 }
 
@@ -274,53 +230,39 @@ function SetUserStatus($service, $urlData, $formData)
     if (($_SESSION["role"] == "admin" or $_SESSION["user"] == $urlData[0])
         and $service->SetUserStatus($urlData[0], $formData)
     ) {
-
         header('HTTP/1.0 200 OK');
         echo json_encode(array(
             'HTTP/1.0' => '200 OK'
         ));
     } else {
         header('HTTP/1.0 400 Bad Request');
-        echo json_encode(array(
-            'error' => 'Bad Request'
-
-        ));
     }
 }
 
 function SetUserRole($service, $urlData, $formData)
 {
-    if (($_SESSION["role"] == "admin" or $_SESSION["user"] == $urlData[0])
-        and $service->SetUserRole($urlData[0], $formData)
+    if ($_SESSION["role"] == "admin" and $service->SetUserRole($urlData[0], $formData)
     ) {
-
         header('HTTP/1.0 200 OK');
         echo json_encode(array(
             'HTTP/1.0' => '200 OK'
         ));
     } else {
-        header('HTTP/1.0 400 Bad Request');
-        echo json_encode(array(
-            'error' => 'Bad Request'
-
-        ));
+        header('HTTP/1.0 403 Forbidden');
     }
 }
 
 
-function Delete($service, $urlData, $formData){
+function Delete($service, $urlData, $formData)
+{
     global $service, $serviceLogin;
-    if ($_SESSION["role"] == "admin"  and $service->DeleteUser($urlData[0])){
+    if ($_SESSION["role"] == "admin"  and $service->DeleteUser($urlData[0])) {
         header('HTTP/1.0 200 OK');
         echo json_encode(array(
             'HTTP/1.0' => '200 OK'
         ));
     } else {
-        header('HTTP/1.0 400 Bad Request');
-        echo json_encode(array(
-            'error' => 'Bad Request'
-
-        ));
+        header('HTTP/1.0 403 Forbidden');
     }
 }
 ?>

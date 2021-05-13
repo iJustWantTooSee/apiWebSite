@@ -27,7 +27,10 @@ if(isset($router) and $router!=""){
         route($method, $urlData, $formData);
     }
     catch(Exception $e){
-        echo 'Такого адреса не существует';
+        header('HTTP/1.0 404 Bad Request');
+        echo json_encode(array(
+            'error' => 'Bad Request'
+        ));
     }
    
 }

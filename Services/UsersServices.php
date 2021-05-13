@@ -63,12 +63,12 @@ class UsersServices
     {
         global $db;
         if ($_SESSION['role'] == "admin") {
-            $request = "SELECT Name,Surname,UserName, Birthday ,Avatar, Status, CityId, RoleId
+            $request = "SELECT Id, Name,Surname,UserName, Birthday ,Avatar, Status, CityId, RoleId
                 FROM users
                     WHERE Id =$id ";
             $data = $db->GetUserInfo($request);
         } else {
-            $request = "SELECT Name,Surname,UserName,Birthday,Avatar,Status, CityId
+            $request = "SELECT Id, Name,Surname,UserName,Birthday,Avatar,Status, CityId
                  FROM users
                     WHERE Id =$id; ";
             $data = $db->GetUserInfo($request);
@@ -89,7 +89,7 @@ class UsersServices
         $maxId = $db->GetResultsQueries($request)[0][0]+1;
         $request = "INSERT INTO `messages`(`Id`, `Text`, `Date`, `UserId`, `CreatorId`)
          VALUES ($maxId,'$text',NOW(),$userId,$creatorId)";
-
+        $db->DB_Request($request);
         return  $maxId;
     }
 
@@ -116,7 +116,7 @@ class UsersServices
                 $request = "UPDATE `users` SET Avatar = '/$path' WHERE Id = $id";
                 $user = $this->GetSpecifficUser($id);
                 if ($user[0]["Avatar"]  != null) {
-                    if (!unlink($user[0]["Avatar"])) {
+                    if (!unlink(substr($user[0]["Avatar"],1))) {
                         echo 'ERROR';
                     }
                 }

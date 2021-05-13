@@ -1,6 +1,8 @@
 <?php
 session_start();
+
 use DataBase\DatabaseConnector;
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Services/RolesServices.php';
 require_once "DatabaseConnector.php";
 $serviceRoles = new RolesServices();
@@ -21,127 +23,112 @@ function route($method, $urlData, $formData)
         case 'DELETE':
             Delete($method, $urlData, $formData);
             break;
+        default:
+            header('HTTP/1.0 501 Not Implemented');
+            break;
     }
 }
 //TODO продумать, как лучше сделать разбиение на свичкейсе
-function Get($method, $urlData, $formData){
+function Get($method, $urlData, $formData)
+{
     global $serviceRoles;
-    switch(sizeof($urlData)){
+    switch (sizeof($urlData)) {
         case 0:
             OutputRoles();
             break;
         case 1:
             OutputSelectedRole($serviceRoles, $urlData[0]);
             break;
-        case 2:
-            break;
         default:
-        //TODO сделать обработку ошибок
+            header('HTTP/1.0 501 Not Implemented');
             break;
     }
 }
 
-function Post($method, $urlData, $formData){
+function Post($method, $urlData, $formData)
+{
     global $serviceRoles;
-    switch(sizeof($urlData)){
+    switch (sizeof($urlData)) {
         case 0:
             AddRole($serviceRoles, $formData["Name"]);
             break;
-        case 1:
-           
-            break;
-        case 2:
-           
-            break;
         default:
-        //TODO сделать обработку ошибок
+            header('HTTP/1.0 501 Not Implemented');
             break;
     }
 }
 
-function Patch($method, $urlData, $formData){
+function Patch($method, $urlData, $formData)
+{
     global $serviceRoles;
-    switch(sizeof($urlData)){
-        case 0:
-            break;
+    switch (sizeof($urlData)) {
         case 1:
-            EditRole($serviceRoles, $urlData[0] ,$formData["Name"]);
-            break;
-        case 2:
-           
+            EditRole($serviceRoles, $urlData[0], $formData["Name"]);
             break;
         default:
-        //TODO сделать обработку ошибок
+            header('HTTP/1.0 501 Not Implemented');
             break;
     }
 }
 
-function Delete($method, $urlData, $formData){
+function Delete($method, $urlData, $formData)
+{
     global $serviceRoles;
     if ($_SESSION["role"] == "admin" and $serviceRoles->DeleteRole($urlData[0])) {
         header('HTTP/1.0 200 OK');
         echo json_encode(array(
-            'HTTP/1.0' => "200 OK"
+            'HTTP/1.0' => '200 OK'
         ));
     } else {
-        header('HTTP/1.0 400 Bad Request');
-        echo json_encode(array(
-            'error' => 'Bad Request'
-        ));
+        header('HTTP/1.0 403 Forbidden');
     }
 }
 
-function OutputRoles(){
+function OutputRoles()
+{
     global $db;
-    $roles=$db->GetResultsQueriesWithName("SELECT * FROM `roles`",2);
-    
+    $roles = $db->GetResultsQueriesWithName("SELECT * FROM `roles`", 2);
+    header('HTTP/1.0 200 OK');
     echo json_encode(array(
-        'HTTP/1.1' => '200 OK',
-        'data' => $roles 
-    )); 
+        'roles' => $roles
+    ));
 }
 
-function OutputSelectedRole($service, $RoleId){
+function OutputSelectedRole($service, $RoleId)
+{
     $roles = $service->GetSelectedRole($RoleId);
-    if ($roles){
+    if ($roles) {
         header('HTTP/1.0 200 OK');
         echo json_encode(array(
-            'HTTP/1.0' => $roles
+            'roles' => $roles
         ));
     } else {
         header('HTTP/1.0 400 Bad Request');
-        echo json_encode(array(
-            'error' => 'Role Not Found'
-        ));
+
     }
 }
 
-function  AddRole($service, $name){
-    if ($_SESSION["role"] == "admin" and $service->AddRole($name)){
+function  AddRole($service, $name)
+{
+    if ($_SESSION["role"] == "admin" and $service->AddRole($name)) {
         header('HTTP/1.0 200 OK');
         echo json_encode(array(
-            'HTTP/1.0' => "200 OK"
+            'HTTP/1.0' => '200 OK'
         ));
     } else {
-        header('HTTP/1.0 400 Bad Request');
-        echo json_encode(array(
-            'error' => 'Bad Request'
-        ));
+        header('HTTP/1.0 403 Forbidden');
     }
 }
 
-function EditRole($service,$id ,$name){
-    if ($_SESSION["role"] == "admin" and $service->EditRole($id,$name)){
+function EditRole($service, $id, $name)
+{
+    if ($_SESSION["role"] == "admin" and $service->EditRole($id, $name)) {
         header('HTTP/1.0 200 OK');
         echo json_encode(array(
-            'HTTP/1.0' => "200 OK"
+            'HTTP/1.0' => '200 OK'
         ));
     } else {
-        header('HTTP/1.0 400 Bad Request');
-        echo json_encode(array(
-            'error' => 'Bad Request'
-        ));
+        header('HTTP/1.0 403 Forbidden');
     }
 }
-
 ?>

@@ -12,15 +12,12 @@ function route($method, $urlData, $formData)
         case 'GET':
             Get($method, $urlData, $formData);
             break;
-        case 'POST':
-            Post($method, $urlData, $formData);
-            break;
-        case 'PATCH':
-            Patch($method, $urlData, $formData);
-            break;
         case 'DELETE':
             Delete($method, $urlData, $formData);
             break;
+            default:
+            header('HTTP/1.0 501 Not Implemented');
+                break;
     }
 }
 //TODO продумать, как лучше сделать разбиение на свичкейсе
@@ -33,11 +30,9 @@ function Get($method, $urlData, $formData){
         case 1:
             GetSelectedMessage($serviceMessages, $urlData[0]);
             break;
-        case 2:
-            break;
-        default:
-        //TODO сделать обработку ошибок
-            break;
+            default:
+            header('HTTP/1.0 501 Not Implemented');
+                break;
     }
 }
 
@@ -47,20 +42,14 @@ function GetMessages($serviceMessages){
         if ($messages) {
             header('HTTP/1.0 200 OK');
             echo json_encode(array(
-                'HTTP/1.0' => $messages
+                'messages' => $messages
             ));
         } else {
-            header('HTTP/1.0 400 Bad Request');
-            echo json_encode(array(
-                'error' => 'Bad Request'
-            ));
+            header('HTTP/1.0 403 Forbidden');
         }
     }
     else{
-        header('HTTP/1.0 400 Bad Request');
-        echo json_encode(array(
-            'error' => 'Bad Request'
-        ));
+        header('HTTP/1.0 401 Unauthorized');
     }
     
 }
@@ -71,39 +60,17 @@ function GetSelectedMessage($serviceMessages, $messageId){
         if ($messages) {
             header('HTTP/1.0 200 OK');
             echo json_encode(array(
-                'HTTP/1.0' => $messages
+                'messages' => $messages
             ));
         } else {
-            header('HTTP/1.0 400 Bad Request');
-            echo json_encode(array(
-                'error' => 'Bad Request'
-            ));
+            header('HTTP/1.0 403 Forbidden');
         }
     }
     else{
-        header('HTTP/1.0 400 Bad Request');
-        echo json_encode(array(
-            'error' => 'Bad Request'
-        ));
+        header('HTTP/1.0 401 Unauthorized');
     }
 }
 
-function Patch($method, $urlData, $formData){
-    global $servicePosts;
-    switch(sizeof($urlData)){
-        case 0:
-            break;
-        case 1:
-           
-            break;
-        case 2:
-           
-            break;
-        default:
-        //TODO сделать обработку ошибок
-            break;
-    }
-}
 
 
 
