@@ -7,7 +7,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/Services/CitiesServices.php';
 require_once "DatabaseConnector.php";
 $serviceCity = new CitiesServices();
 $db = new DatabaseConnector();
-//куда перенаправляется
+
 function route($method, $urlData, $formData)
 {
     switch ($method) {
@@ -37,10 +37,20 @@ function Get($method, $urlData, $formData)
             OutputCities();
             break;
         case 1:
-            OutputSelectedCity($serviceCity, $urlData[0]);
+            if(is_numeric($urlData[0])){
+                OutputSelectedCity($serviceCity, $urlData[0]);
+            }
+           else{
+            header('HTTP/1.0 403 Forbidden');
+           }
             break;
         case 2:
-            OutputPeopleFromCity($serviceCity, $urlData[0]);
+            if ($urlData[1]=="peoples" and is_numeric($urlData[0])){
+                OutputPeopleFromCity($serviceCity, $urlData[0]);
+            }else{
+                header('HTTP/1.0 403 Forbidden');
+               }
+            
             break;
         default:
             header('HTTP/1.0 501 Not Implemented');
@@ -53,7 +63,12 @@ function Post($method, $urlData, $formData)
     global $serviceCity;
     switch (sizeof($urlData)) {
         case 0:
-            AddCity($serviceCity, $formData["Name"]);
+            if ($formData["Name"]!=""){
+                AddCity($serviceCity, $formData["Name"]);
+            }
+            else{
+                header('HTTP/1.0 400 Bad Request');
+            }
             break;
         default:
             header('HTTP/1.0 501 Not Implemented');
@@ -66,7 +81,9 @@ function Patch($method, $urlData, $formData)
     global $serviceCity;
     switch (sizeof($urlData)) {
         case 1:
-            EditCity($serviceCity, $urlData[0], $formData["Name"]);
+            if($formData["Name"] != ""){
+                EditCity($serviceCity, $urlData[0], $formData["Name"]);
+            }
             break;
         default:
             header('HTTP/1.0 501 Not Implemented');
@@ -76,22 +93,27 @@ function Patch($method, $urlData, $formData)
 
 function Delete($method, $urlData, $formData)
 {
-    global $serviceCity;
-    if ($_SESSION["role"] == "admin" and $serviceCity->DeleteCity($urlData[0])) {
-        header('HTTP/1.0 200 OK');
-        echo json_encode(array(
-            'HTTP/1.0' => '200 OK'
-        ));
-    } else {
-        header('HTTP/1.0 403 Forbidden');
+    if(is_numeric($urlData[0]) and $urlData[1]==""){
+        global $serviceCity;
+        if ($_SESSION["role"] == "admin" and $serviceCity->DeleteCity($urlData[0])) {
+            header('HTTP/1.0 200 OK');
+            echo json_encode(array(
+                'HTTP/1.0' => '200 OK'
+            ));
+        } else {
+            header('HTTP/1.0 403 Forbidden');
+        }
     }
+    else{
+        header('HTTP/1.0 501 Not Implemented');
+    }
+    
 }
 
 function OutputCities()
 {
     global $db;
-    $cities = $db->GetResultsQueries("SELECT * FROM cities", 2);
-
+    $cities = $db->GetCities("SELECT * FROM cities", 2);
     echo json_encode(array(
         'cities' => $cities
     ));

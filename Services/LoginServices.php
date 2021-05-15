@@ -10,6 +10,8 @@
             $Username = htmlentities(mysqli_real_escape_string($MySqlLink,$formData["Username"]));  
 	        $Password = md5(htmlentities(mysqli_real_escape_string($MySqlLink,$formData["Password"])));  
             $request = "SELECT Id, RoleId FROM `users` WHERE Username = '$Username' and Password ='$Password'";
+            $head=getallheaders();
+            $temp=$_SERVER['Authorization'];
             $user = $db->GetResultsQueries($request, 7);
             if (sizeof($user)==1){
                 $_SESSION["user"] = $user[0][0];

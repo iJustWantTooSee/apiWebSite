@@ -50,10 +50,10 @@ class UsersServices
     {
         global $db;
         if ($_SESSION['role'] == "admin") {
-            $request = "SELECT Name,Surname,UserName,Birthday,Avatar, Status, CityId, RoleId FROM users; ";
+            $request = "SELECT Id, Name,Surname,UserName,Birthday,Avatar, Status, CityId, RoleId FROM users; ";
             $data = $db->GetUserInfo($request);
         } else {
-            $request = "SELECT Name,Surname,UserName,Birthday,Avatar, Status, CityId FROM users; ";
+            $request = "SELECT Id, Name,Surname,UserName,Birthday,Avatar, Status, CityId FROM users; ";
             $data = $db->GetUserInfo($request);
         }
         return $data;
@@ -105,16 +105,16 @@ class UsersServices
     {
         global $db;
         $user = array();
+        $user = $this->GetSpecifficUser($id);
         $allowedTypes = array(IMAGETYPE_PNG, IMAGETYPE_JPEG, IMAGETYPE_GIF);
         $detectedType = exif_imagetype($_FILES['File']['tmp_name']);
         if ($_FILES && $_FILES["filename"]["error"] == UPLOAD_ERR_OK 
-        && in_array($detectedType,$allowedTypes)) {
+        && in_array($detectedType,$allowedTypes) and $user) {
 
             $name = htmlspecialchars(basename($_FILES["File"]["name"]));
             $path = "Uploads/$dir/" . time() . $name;
             if (move_uploaded_file($_FILES["File"]["tmp_name"], $path)) {
                 $request = "UPDATE `users` SET Avatar = '/$path' WHERE Id = $id";
-                $user = $this->GetSpecifficUser($id);
                 if ($user[0]["Avatar"]  != null) {
                     if (!unlink(substr($user[0]["Avatar"],1))) {
                         echo 'ERROR';
@@ -184,6 +184,9 @@ class UsersServices
             $newRequest .= "Avatar='$Avatar' ";
             $user[0]["Avatar"] = $Avatar;
         }
+        else{
+            mb_substr($newRequest,0,-2);
+        }
 
 
         $newRequest .= "WHERE Id=$id";
@@ -195,12 +198,11 @@ class UsersServices
         return $user;
     }
 
-    function SetUserCity($id, $formData): bool
+    function SetUserCity($id, $cityId): bool
     {
         global $db;
         $MySqlLink = $db->GetMySqlLink();
-        $CityId = htmlentities(mysqli_real_escape_string($MySqlLink, $formData["CityId"]));
-        $request = "UPDATE `users` SET CityId = '$CityId' WHERE Id = $id";
+        $request = "UPDATE `users` SET CityId = '$cityId' WHERE Id = $id";
         if (!$db->DB_Request($request)) {
             return false;
         }

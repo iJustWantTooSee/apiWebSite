@@ -37,7 +37,12 @@ function Get($method, $urlData, $formData)
             OutputRoles();
             break;
         case 1:
-            OutputSelectedRole($serviceRoles, $urlData[0]);
+            if(is_numeric($urlData[0])){
+                OutputSelectedRole($serviceRoles, $urlData[0]);
+            }
+            else{
+                header('HTTP/1.0 501 Not Implemented');
+            }
             break;
         default:
             header('HTTP/1.0 501 Not Implemented');
@@ -63,7 +68,12 @@ function Patch($method, $urlData, $formData)
     global $serviceRoles;
     switch (sizeof($urlData)) {
         case 1:
-            EditRole($serviceRoles, $urlData[0], $formData["Name"]);
+            if(is_numeric($urlData[0])){
+                EditRole($serviceRoles, $urlData[0], $formData["Name"]);
+            }
+            else{
+                header('HTTP/1.0 501 Not Implemented'); 
+            }
             break;
         default:
             header('HTTP/1.0 501 Not Implemented');
@@ -73,15 +83,20 @@ function Patch($method, $urlData, $formData)
 
 function Delete($method, $urlData, $formData)
 {
-    global $serviceRoles;
-    if ($_SESSION["role"] == "admin" and $serviceRoles->DeleteRole($urlData[0])) {
-        header('HTTP/1.0 200 OK');
-        echo json_encode(array(
-            'HTTP/1.0' => '200 OK'
-        ));
-    } else {
-        header('HTTP/1.0 403 Forbidden');
+    if (is_numeric($urlData[0]) and $urlData[1]==""){
+        global $serviceRoles;
+        if ($_SESSION["role"] == "admin" and $serviceRoles->DeleteRole($urlData[0])) {
+            header('HTTP/1.0 200 OK');
+            echo json_encode(array(
+                'HTTP/1.0' => '200 OK'
+            ));
+        } else {
+            header('HTTP/1.0 403 Forbidden');
+        }
     }
+    else{
+        header('HTTP/1.0 501 Not Implemented');  
+    }  
 }
 
 function OutputRoles()

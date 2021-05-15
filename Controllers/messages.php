@@ -1,6 +1,8 @@
 <?php
 session_start();
+
 use DataBase\DatabaseConnector;
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Services/MessagesServices.php';
 require_once "DatabaseConnector.php";
 $serviceMessages = new PostsServices();
@@ -15,29 +17,35 @@ function route($method, $urlData, $formData)
         case 'DELETE':
             Delete($method, $urlData, $formData);
             break;
-            default:
+        default:
             header('HTTP/1.0 501 Not Implemented');
-                break;
+            break;
     }
 }
 //TODO продумать, как лучше сделать разбиение на свичкейсе
-function Get($method, $urlData, $formData){
+function Get($method, $urlData, $formData)
+{
     global $serviceMessages;
-    switch(sizeof($urlData)){
+    switch (sizeof($urlData)) {
         case 0:
-           GetMessages($serviceMessages);
+            GetMessages($serviceMessages);
             break;
         case 1:
-            GetSelectedMessage($serviceMessages, $urlData[0]);
+            if (is_numeric($urlData[0]) and $urlData[1] == "") {
+                GetSelectedMessage($serviceMessages, $urlData[0]);
+            } else {
+                header('HTTP/1.0 501 Not Implemented');
+            }
             break;
-            default:
+        default:
             header('HTTP/1.0 501 Not Implemented');
-                break;
+            break;
     }
 }
 
-function GetMessages($serviceMessages){
-    if ($_SESSION["user"]!="" and isset($_SESSION['user'])){
+function GetMessages($serviceMessages)
+{
+    if ($_SESSION["user"] != "" and isset($_SESSION['user'])) {
         $messages = $serviceMessages->GetMessages($_SESSION['user']);
         if ($messages) {
             header('HTTP/1.0 200 OK');
@@ -47,15 +55,14 @@ function GetMessages($serviceMessages){
         } else {
             header('HTTP/1.0 403 Forbidden');
         }
-    }
-    else{
+    } else {
         header('HTTP/1.0 401 Unauthorized');
     }
-    
 }
 
-function GetSelectedMessage($serviceMessages, $messageId){
-    if ($_SESSION["user"]!="" and isset($_SESSION['user'])){
+function GetSelectedMessage($serviceMessages, $messageId)
+{
+    if ($_SESSION["user"] != "" and isset($_SESSION['user'])) {
         $messages = $serviceMessages->GetSelectedMessage($_SESSION['user'], $messageId);
         if ($messages) {
             header('HTTP/1.0 200 OK');
@@ -65,8 +72,7 @@ function GetSelectedMessage($serviceMessages, $messageId){
         } else {
             header('HTTP/1.0 403 Forbidden');
         }
-    }
-    else{
+    } else {
         header('HTTP/1.0 401 Unauthorized');
     }
 }
@@ -74,21 +80,23 @@ function GetSelectedMessage($serviceMessages, $messageId){
 
 
 
-function Delete($method, $urlData, $formData){
-    global $serviceMessages;
-    if ($serviceMessages->DeleteMessage($_SESSION['user'],$urlData[0])) {
-        header('HTTP/1.0 200 OK');
-        echo json_encode(array(
-            'HTTP/1.0' => "200 OK"
-        ));
+function Delete($method, $urlData, $formData)
+{
+    if (is_numeric($urlData[0]) and $urlData[1] == "") {
+        global $serviceMessages;
+        if ($serviceMessages->DeleteMessage($_SESSION['user'], $urlData[0])) {
+            header('HTTP/1.0 200 OK');
+            echo json_encode(array(
+                'HTTP/1.0' => "200 OK"
+            ));
+        } else {
+            header('HTTP/1.0 400 Bad Request');
+            echo json_encode(array(
+                'error' => 'Bad Request'
+            ));
+        }
     } else {
-        header('HTTP/1.0 400 Bad Request');
-        echo json_encode(array(
-            'error' => 'Bad Request'
-        ));
+        header('HTTP/1.0 401 Unauthorized');
     }
 }
-
-
-
 ?>

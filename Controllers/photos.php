@@ -47,8 +47,10 @@ function OutputPhotos($service)
         echo json_encode(array(
             'photo' => $photo
         ));
+        exit();
     } else {
         header('HTTP/1.0 403 Forbidden');
+        exit();
     }
 }
 
@@ -61,21 +63,28 @@ function Post($method, $urlData, $formData)
             break;
         default:
             header('HTTP/1.0 501 Not Implemented');
+            exit();
             break;
     }
 }
 
 function Delete($method, $urlData, $formData)
 {
-    global $servicePhotos;
-    if ($servicePhotos->DeletePhoto($urlData[0])) {
-        header('HTTP/1.0 200 OK');
-        echo json_encode(array(
-            'HTTP/1.0' => '200 OK'
-        ));
-    } else {
-        header('HTTP/1.0 403 Forbidden');
+    if(is_numeric($urlData[0]) and $urlData[1]==""){
+        global $servicePhotos;
+        if ($servicePhotos->DeletePhoto($urlData[0])) {
+            header('HTTP/1.0 200 OK');
+            echo json_encode(array(
+                'HTTP/1.0' => '200 OK'
+            ));
+        } else {
+            header('HTTP/1.0 403 Forbidden');
+        }
     }
+    else{
+        header('HTTP/1.0 501 Not Implemented');
+    }
+    exit();
 }
 
 function AddPhoto($service, $urlData, $formData)
@@ -89,5 +98,6 @@ function AddPhoto($service, $urlData, $formData)
     } else {
         header('HTTP/1.0 403 Forbidden');
     }
+    exit();
 }
 ?>

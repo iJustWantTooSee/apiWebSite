@@ -37,7 +37,12 @@ function Get($method, $urlData, $formData)
             GetAllUser($service);
             break;
         case 1:
-            GetUser($service, $urlData);
+            if (is_numeric($urlData[0])){
+                GetUser($service, $urlData);
+            }
+            else{
+                header('HTTP/1.0 400 Bad Request');
+            }
             break;
         case 2:
             if ($urlData[0] == "photos") {
@@ -79,6 +84,7 @@ function GetAllUser($service)
     echo json_encode(array(
         'users' => $users
     ));
+    exit();
 }
 
 function GetUser($service, $urlData)
@@ -97,7 +103,7 @@ function GetSelectedUserPhotos($service, $id)
 
     header('HTTP/1.0 200 OK');
     echo json_encode(array(
-        'users' => $photos
+        'photos' => $photos
     ));
 }
 
@@ -133,10 +139,16 @@ function Post($method, $urlData, $formData)
             if ($urlData[1] == "avatar") {
                 if (($_SESSION["role"] == "admin" or $_SESSION["user"] == $urlData[0])) {
                     $user = $service->AddAvatar($urlData[0], "Avatars");
-                    header('HTTP/1.0 200 OK');
-                    echo json_encode(array(
-                        'user' => $user
-                    ));
+                    if($user){
+                        header('HTTP/1.0 200 OK');
+                        echo json_encode(array(
+                            'user' => $user
+                        ));
+                    }
+                    else{
+                        header('HTTP/1.0 400 Bad Request');
+                    }
+                    
                 } else {
                     header('HTTP/1.0 400 Bad Request');
                 }
@@ -149,6 +161,7 @@ function Post($method, $urlData, $formData)
                     header('HTTP/1.0 400 Bad Request');
                 }
             }
+            exit();
             break;
         default:
             header('HTTP/1.0 501 Not Implemented');
@@ -174,7 +187,12 @@ function Patch($method, $urlData, $formData)
     global $service, $serviceLogin;
     switch (sizeof($urlData)) {
         case 1:
-            EditUser($service, $urlData, $formData);
+            if(is_numeric($urlData[0])){
+                EditUser($service, $urlData, $formData);
+            }
+            else{
+                header('HTTP/1.0 400 Bad Request');
+            }
             break;
         case 2:
             switch ($urlData[1]) {
@@ -213,8 +231,8 @@ function EditUser($service, $urlData, $formData)
 
 function SetUserCity($service, $urlData, $formData)
 {
-    if (($_SESSION["role"] == "admin" or $_SESSION["user"] == $urlData[0])
-        and $service->SetUserCity($urlData[0], $formData)
+    if (($_SESSION["role"] == "admin" or $_SESSION["user"] == $urlData[0]) and is_numeric($formData["CityId"])
+        and $service->SetUserCity($urlData[0], $formData["CityId"])
     ) {
         header('HTTP/1.0 200 OK');
         echo json_encode(array(
@@ -255,14 +273,20 @@ function SetUserRole($service, $urlData, $formData)
 
 function Delete($service, $urlData, $formData)
 {
-    global $service, $serviceLogin;
-    if ($_SESSION["role"] == "admin"  and $service->DeleteUser($urlData[0])) {
-        header('HTTP/1.0 200 OK');
-        echo json_encode(array(
-            'HTTP/1.0' => '200 OK'
-        ));
-    } else {
-        header('HTTP/1.0 403 Forbidden');
+    if(is_numeric($urlData[0]) and $urlData[1]==""){
+        global $service, $serviceLogin;
+        if ($_SESSION["role"] == "admin"  and $service->DeleteUser($urlData[0])) {
+            header('HTTP/1.0 200 OK');
+            echo json_encode(array(
+                'HTTP/1.0' => '200 OK'
+            ));
+        } else {
+            header('HTTP/1.0 403 Forbidden');
+        }
     }
+    else {
+        header('HTTP/1.0 501 Not Implemented');
+    }
+    
 }
 ?>

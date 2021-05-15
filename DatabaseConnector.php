@@ -3,6 +3,7 @@
 namespace DataBase;
 use enums\UserStatus;
 use mysqli;
+use stdClass;
 
 require_once 'C:\viktor\key\connection.php';
 require_once "Enums/Status.php";
@@ -120,6 +121,24 @@ class DatabaseConnector
             }
             $link->close();
             return $data;
+        }
+        $link->close();
+    }
+
+
+    function GetCities($request){
+        $link = $this->GetMySqlLink();
+        $res = mysqli_query($link, $request) or die("Ошибка " . mysqli_error($link));
+        if (!$res) //SQL
+        {
+            echo "Не удалось выполнить запрос: (" . $link->errno . ") " . $link->error;
+        } else {
+            $data = new stdClass();
+            while($city = $res->fetch_object()){
+                $data->temp[] = $city;
+            }
+            $link->close();
+            return $data->temp;
         }
         $link->close();
     }
